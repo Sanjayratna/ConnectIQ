@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ConnectIQ • Register as Volunteer</title>
+  <link rel="stylesheet" href="assets/style.css" />
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
+  <style>
+    .form{max-width:640px;margin:48px auto;background:#fff;border:1px solid var(--border);border-radius:16px;padding:22px}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .field{display:flex;flex-direction:column;gap:6px;margin:10px 0}
+    input,select{padding:12px 14px;border:1px solid var(--border);border-radius:12px;font-size:16px}
+    textarea{padding:12px 14px;border:1px solid var(--border);border-radius:12px;font-size:16px;min-height:110px}
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="container navbar-inner">
+      <button class="hamburger" id="menuBtn" aria-label="Open menu"><span></span></button>
+      <a class="brand" href="worklink.html"><span class="brand-badge"><img alt="ConnectIQ" src="assets/logo.svg"/></span> ConnectIQ</a>
+      <div class="navlinks">
+        <a class="btn" href="login.html">Login</a>
+        <a class="btn primary" data-cta="volunteer" href="register-volunteer.html">Register as Volunteer</a>
+        <a class="btn" data-cta="organizer" href="register-organizer.html">Register as Organizer</a>
+        <a class="btn back-top" href="javascript:history.back()" aria-label="Go back">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="margin-right:6px; vertical-align:middle"><path d="M15 18l-6-6 6-6" stroke="#1f2a44" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back
+        </a>
+      </div>
+    </div>
+  </nav>
+  <aside class="sidebar" id="sidebar">
+    <h3>Options</h3>
+    <a href="browse.html" data-side="browse"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke-width="2"/><path d="M12 3v18" stroke-width="2"/><path d="M3 12h18" stroke-width="2"/></svg>Browse Jobs</a>
+    <a href="worklink.html" data-side="dashboard"><svg viewBox="0 0 24 24" fill="none"><path d="M3 13h8V3H3v10zm10 8h8V3h-8v18z" stroke-width="2"/></svg>Dashboard</a>
+    <a href="#" data-side="location"><svg viewBox="0 0 24 24" fill="none"><path d="M12 21s-6-5.2-6-10a6 6 0 1 1 12 0c0 4.8-6 10-6 10z" stroke-width="2"/><circle cx="12" cy="11" r="2" stroke-width="2"/></svg>Location</a>
+    <a href="worklink.html" data-side="settings"><svg viewBox="0 0 24 24" fill="none"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" stroke-width="2"/><path d="M19.4 15a7.96 7.96 0 0 0 .1-2 7.96 7.96 0 0 0-.1-2l2.1-1.6-2-3.4-2.5 1a8.2 8.2 0 0 0-3.5-2L13 1h-4l-.5 3.1a8.2 8.2 0 0 0-3.5 2l-2.5-1-2 3.4 2.1 1.6a7.96 7.96 0 0 0-.1 2 7.96 7.96 0 0 0 .1 2L.5 16.6l2 3.4 2.5-1a8.2 8.2 0 0 0 3.5 2L9 23h4l.5-3.1a8.2 8.2 0 0 0 3.5-2l2.5 1 2-3.4-2.1-1.6z" stroke-width="2"/></svg>Settings</a>
+    <a href="#" data-side="help"><svg viewBox="0 0 24 24" fill="none"><path d="M9.1 9a3 3 0 1 1 5.8 1c0 2-3 2-3 4" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="19" r="1"/></svg>Help</a>
+    <a href="#" data-side="language"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3v18M3 12h18" stroke-width="2"/></svg>Language</a>
+  </aside>
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+  <main class="container">
+    <section class="form">
+      <h2>Volunteer Registration</h2>
+      <div class="row">
+        <div class="field"><label>First Name</label><input placeholder="Alex" /></div>
+        <div class="field"><label>Last Name</label><input placeholder="Doe" /></div>
+      </div>
+      <div class="row">
+        <div class="field"><label>Email</label><input type="email" placeholder="you@example.com" /></div>
+        <div class="field"><label>Phone</label><input placeholder="(123) 456-7890" /></div>
+      </div>
+      <div class="field"><label>Skills</label><input placeholder="e.g. Communication, First Aid" /></div>
+      <div class="field"><label>About You</label><textarea placeholder="Tell us about yourself..."></textarea></div>
+      <a class="btn primary" href="browse.html">Create Account</a>
+    </section>
+  </main>
+  <script src="assets/app.js"></script>
+</body>
+</html>

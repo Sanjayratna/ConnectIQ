@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ConnectIQ • Browse Jobs</title>
+  <link rel="stylesheet" href="assets/style.css" />
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
+  <meta name="description" content="Browse opportunities that match your skills and interests." />
+  <meta name="theme-color" content="#4c6fff" />
+</head>
+<body>
+  <style>
+    /* Dashboard theme to mirror reference */
+    .dashboard{display:none;background:linear-gradient(135deg,#0e1b39 0%, #243f7a 60%, #395fa9 100%);padding:16px;border-radius:16px;color:#e7edf8}
+    .dash-top{display:grid;grid-template-columns:260px 1fr 1fr 220px;gap:16px;margin-bottom:10px}
+    .dash-top .tab{border:1px solid rgba(255,255,255,.35);border-radius:10px;padding:10px 12px;font-weight:700;letter-spacing:.2px}
+    .dash-top .tab span{opacity:.9}
+    .dash-grid{display:grid;grid-template-columns:260px 1fr 220px;gap:16px}
+    .dash-card{background:rgba(12,23,47,.35);backdrop-filter:blur(2px);border:1px solid rgba(255,255,255,.25);border-radius:10px;padding:16px}
+    .dash-title{display:flex;align-items:center;gap:10px;font-weight:700;margin-bottom:8px;border-bottom:1px solid rgba(255,255,255,.25);padding-bottom:6px}
+    .org-tile{background:linear-gradient(135deg,#f59e0b 0%, #fbbf24 55%, #fde68a 100%);color:#0e1b39;border:0}
+    .org-name{font-size:18px;font-weight:800;margin-top:10px;color:#0e1b39;text-transform:uppercase}
+    .donut{width:160px;height:160px}
+    .donut text{font-size:18px;fill:#e7edf8;font-weight:800}
+    .mini-ring{width:120px;height:120px}
+    .sales{height:160px; width:100%}
+    .rating-overlay{position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,.45); z-index:1000}
+    .rating-overlay.show{display:flex}
+    .rating-panel{width:320px; background:#0e1b39; color:#e7edf8; border:1px solid rgba(255,255,255,.25); border-radius:10px; box-shadow:0 10px 24px rgba(0,0,0,.35); padding:14px; display:flex; flex-direction:column; gap:10px}
+    .rating-panel h4{margin:0; font-weight:800}
+    .rating-actions{display:flex; gap:10px; justify-content:flex-end}
+    .rating-actions button{border:1px solid rgba(255,255,255,.25); background:rgba(255,255,255,.08); color:#e7edf8; border-radius:8px; padding:8px 12px; font-weight:700; cursor:pointer}
+    body.modal-blur .dashboard{filter:blur(3px)}
+    .dash-head{display:flex;gap:16px;align-items:center}
+    .dash-row{display:flex;gap:16px;align-items:center}
+    .kpi{background:#f59e0b;color:#0e1b39;border:0;border-radius:10px;padding:14px 16px;text-align:center;font-weight:800}
+    .kpi div:first-child{font-size:12px;color:#0e1b39;opacity:.85;font-weight:600}
+    .kpi div:last-child{font-size:22px}
+    .muted-on-blue{color:#b9c6e4;font-size:12px}
+    .donut-title{font-weight:800; margin:0 0 6px}
+    .donut-notes{display:flex; justify-content:space-between; gap:16px; margin-top:6px; color:#b9c6e4; font-size:12px}
+    .stat-box{background:#f59e0b; color:#0e1b39; border-radius:8px; padding:14px 16px; width:200px; box-shadow:0 1px 0 rgba(255,255,255,.6) inset; position:relative}
+    .stat-box .value{font-size:26px; font-weight:800}
+    .stat-box .label{font-weight:700; opacity:.9}
+    .stat-box .pill{display:inline-block; background:#fff; color:#0e1b39; font-size:11px; padding:4px 8px; border-radius:4px; margin-top:6px; font-weight:700}
+    .stat-box .profile-ico{position:absolute; right:10px; top:10px; width:20px; height:20px; cursor:pointer}
+    .stat-box .profile-info{position:absolute; top:50%; transform:translateY(-50%); left:calc(100% + 30px); width:200px; background:rgba(12,23,47,.9); color:#e7edf8; border:1px solid rgba(255,255,255,.25); border-radius:10px; padding:10px 12px; box-shadow:0 10px 24px rgba(0,0,0,.25); display:none !important; z-index:5}
+    .stat-box.show-info .profile-info{display:none !important}
+    .stat-box .profile-info .head{font-weight:800; margin:0 0 8px; letter-spacing:.2px}
+    .stat-box .profile-info ul{margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:6px}
+    .stat-box .profile-info li{font-weight:700; letter-spacing:.2px}
+    
+    /* New separators and inner boxes */
+    .org-inner{background:rgba(255,255,255,.9);border-radius:8px;padding:14px 12px;display:inline-block}
+    .org-sep{height:1px;background:rgba(14,27,57,.25);margin:14px 0}
+    .org-metric{font-size:26px;font-weight:800}
+    .section-sep{display:flex;align-items:center;gap:10px;margin:10px 0 8px}
+    .section-sep:before{content:"";display:block;height:1px;background:rgba(255,255,255,.35);flex:1}
+    .section-sep span{white-space:nowrap;font-weight:700;letter-spacing:.2px}
+    /* Fullscreen dashboard override */
+    body.dashboard-full .container{max-width:none; padding:0}
+    body.dashboard-full .dashboard{border-radius:0; min-height:100vh}
+    body.dashboard-full .footer-space{display:none}
+    /* Transparent panels */
+    .dash-card.transparent{background:transparent}
+    /* Settings panel */
+    .settings-panel{display:none; background:rgba(12,23,47,.35); border:1px solid rgba(255,255,255,.25); border-radius:12px; padding:18px; color:#e7edf8}
+    .settings-title{font-weight:800; margin:0 0 12px; border-bottom:1px solid rgba(255,255,255,.25); padding-bottom:8px}
+    .settings-list{display:flex; flex-direction:column; gap:12px; max-width:640px}
+    .settings-btn{display:flex; align-items:center; justify-content:space-between; gap:10px; border:1px solid rgba(255,255,255,.3); background:transparent; color:#e7edf8; padding:12px 14px; border-radius:10px; font-weight:700; cursor:pointer}
+    .settings-btn:hover{background:rgba(255,255,255,.06)}
+    @media(max-width: 980px){
+      .dash-top{grid-template-columns:1fr 1fr}
+      .dash-grid{grid-template-columns:1fr;}
+    }
+  </style>
+  <!-- Splash: handshake then logo pop -->
+  <div class="splash" aria-hidden="true">
+    <div class="globe-bg" aria-hidden="true">
+      <div class="globe-gif" aria-hidden="true"></div>
+      <div class="globe-half globe-left">
+        <video class="globe-vid" src="assets/globe.mp4" autoplay muted loop playsinline></video>
+        <svg viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="bgL" cx="50%" cy="50%" r="60%">
+              <stop offset="0%" stop-color="#0e1b39"/>
+              <stop offset="100%" stop-color="#243f7a"/>
+            </radialGradient>
+            <linearGradient id="connL" x1="0" x2="1">
+              <stop offset="0%" stop-color="#f59e0b"/>
+              <stop offset="100%" stop-color="#fde68a"/>
+            </linearGradient>
+          </defs>
+          <circle cx="300" cy="300" r="300" fill="url(#bgL)"/>
+          <g class="globe-rot">
+            <circle cx="300" cy="300" r="200" fill="none" stroke="#6b7aa6" stroke-width="2"/>
+            <ellipse cx="300" cy="300" rx="200" ry="90" fill="none" stroke="#6b7aa6" stroke-width="2"/>
+            <ellipse cx="300" cy="300" rx="200" ry="130" fill="none" stroke="#6b7aa6" stroke-width="2" transform="rotate(30 300 300)"/>
+            <ellipse cx="300" cy="300" rx="200" ry="130" fill="none" stroke="#6b7aa6" stroke-width="2" transform="rotate(-30 300 300)"/>
+            <path d="M150 260 Q300 160 450 260" stroke="url(#connL)" stroke-width="3" fill="none"/>
+            <path d="M180 340 Q300 420 420 340" stroke="url(#connL)" stroke-width="3" fill="none"/>
+            <circle cx="150" cy="260" r="5" fill="#fde68a"/>
+            <circle cx="450" cy="260" r="5" fill="#f59e0b"/>
+            <circle cx="180" cy="340" r="5" fill="#fde68a"/>
+            <circle cx="420" cy="340" r="5" fill="#f59e0b"/>
+          </g>
+        </svg>
+      </div>
+      
+      <div class="globe-half globe-right">
+        <video class="globe-vid" src="assets/globe.mp4" autoplay muted loop playsinline></video>
+        <svg viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="bgR" cx="50%" cy="50%" r="60%">
+              <stop offset="0%" stop-color="#0e1b39"/>
+              <stop offset="100%" stop-color="#243f7a"/>
+            </radialGradient>
+            <linearGradient id="connR" x1="0" x2="1">
+              <stop offset="0%" stop-color="#f59e0b"/>
+              <stop offset="100%" stop-color="#fde68a"/>
+            </linearGradient>
+          </defs>
+          <circle cx="300" cy="300" r="300" fill="url(#bgR)"/>
+          <g class="globe-rot">
+            <circle cx="300" cy="300" r="200" fill="none" stroke="#6b7aa6" stroke-width="2"/>
+            <ellipse cx="300" cy="300" rx="200" ry="90" fill="none" stroke="#6b7aa6" stroke-width="2"/>
+            <ellipse cx="300" cy="300" rx="200" ry="130" fill="none" stroke="#6b7aa6" stroke-width="2" transform="rotate(30 300 300)"/>
+            <ellipse cx="300" cy="300" rx="200" ry="130" fill="none" stroke="#6b7aa6" stroke-width="2" transform="rotate(-30 300 300)"/>
+            <path d="M150 260 Q300 160 450 260" stroke="url(#connR)" stroke-width="3" fill="none"/>
+            <path d="M180 340 Q300 420 420 340" stroke="url(#connR)" stroke-width="3" fill="none"/>
+            <circle cx="150" cy="260" r="5" fill="#fde68a"/>
+            <circle cx="450" cy="260" r="5" fill="#f59e0b"/>
+            <circle cx="180" cy="340" r="5" fill="#fde68a"/>
+            <circle cx="420" cy="340" r="5" fill="#f59e0b"/>
+          </g>
+        </svg>
+      </div>
+      <!-- Split overlay panels to ensure a visible split effect -->
+      <div class="split-mask" aria-hidden="true">
+        <div class="panel-left"></div>
+        <div class="panel-right"></div>
+      </div>
+    </div>
+    <div class="splash-inner">
+      <!-- Realistic handshake video: place your MP4 at assets/handshake.mp4 -->
+      <div class="splash-pretitle"><span class="logo-badge"><img alt="ConnectIQ" src="assets/logo.svg"/></span> ConnectIQ</div>
+      <div class="logo-pop"><span class="logo-badge"><img alt="ConnectIQ" src="assets/logo.svg"/></span></div>
+      <div class="quote-pop">“where talent and teamwork make work easy”</div>
+      <button class="start-btn" id="startBtn" type="button">Get Started
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="margin-left:6px; vertical-align:middle"><path d="M5 12h14M13 5l7 7-7 7" stroke="#0e1b39" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="app">
+  <nav class="navbar">
+    <div class="container navbar-inner">
+      <button class="hamburger" id="menuBtn" aria-label="Open menu"><span></span></button>
+      <a class="brand" href="worklink.html"><span class="brand-badge"><img alt="ConnectIQ" src="assets/logo.svg"/></span> ConnectIQ</a>
+      <div class="navlinks">
+        <a class="btn" href="login.html">Login</a>
+        <a class="btn primary" data-cta="volunteer" href="register-volunteer.html">Register as Volunteer</a>
+        <a class="btn" data-cta="organizer" href="register-organizer.html">Register as Organizer</a>
+      </div>
+    </div>
+  </nav>
+  <aside class="sidebar" id="sidebar">
+    <h3>Options</h3>
+    <a href="#" data-side="home"><svg viewBox="0 0 24 24" fill="none"><path d="M3 10l9-7 9 7v9a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-4H9v4a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-9z" stroke-width="2"/></svg>Home</a>
+    <a href="browse.html" data-side="browse"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke-width="2"/><path d="M12 3v18" stroke-width="2"/><path d="M3 12h18" stroke-width="2"/></svg>Browse Jobs</a>
+    <a href="#" data-side="dashboard"><svg viewBox="0 0 24 24" fill="none"><path d="M3 13h8V3H3v10zm10 8h8V3h-8v18z" stroke-width="2"/></svg>Dashboard</a>
+    <a href="#" data-side="location"><svg viewBox="0 0 24 24" fill="none"><path d="M12 21s-6-5.2-6-10a6 6 0 1 1 12 0c0 4.8-6 10-6 10z" stroke-width="2"/><circle cx="12" cy="11" r="2" stroke-width="2"/></svg>Location</a>
+    <a href="#" data-side="settings"><svg viewBox="0 0 24 24" fill="none"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" stroke-width="2"/><path d="M19.4 15a7.96 7.96 0 0 0 .1-2 7.96 7.96 0 0 0-.1-2l2.1-1.6-2-3.4-2.5 1a8.2 8.2 0 0 0-3.5-2L13 1h-4l-.5 3.1a8.2 8.2 0 0 0-3.5 2l-2.5-1-2 3.4 2.1 1.6a7.96 7.96 0 0 0-.1 2 7.96 7.96 0 0 0 .1 2L.5 16.6l2 3.4 2.5-1a8.2 8.2 0 0 0 3.5 2L9 23h4l.5-3.1a8.2 8.2 0 0 0 3.5-2l2.5 1 2-3.4-2.1-1.6z" stroke-width="2"/></svg>Settings</a>
+    <a href="#" data-side="help"><svg viewBox="0 0 24 24" fill="none"><path d="M9.1 9a3 3 0 1 1 5.8 1c0 2-3 2-3 4" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="19" r="1"/></svg>Help</a>
+    <a href="#" data-side="language"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3v18M3 12h18" stroke-width="2"/></svg>Language</a>
+  </aside>
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+  <main class="container">
+    <section class="dashboard" id="dashboard">
+      <div class="dash-top">
+        <div class="tab"><span>Organization name</span></div>
+        <div class="tab"><span>Max no of hours</span></div>
+        <div class="tab"><span>Amount Earned</span></div>
+        <div class="tab"><span>Rating</span></div>
+      </div>
+      <div class="dash-grid">
+        <div class="dash-card org-tile">
+          <div class="dash-title">Organization name</div>
+          <div class="org-inner">
+            <svg width="38" height="38" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#1f2a44" stroke-width="2"/><circle cx="12" cy="9" r="3" fill="#1f2a44"/></svg>
+            <div class="org-name">Botique Solutions</div>
+          </div>
+          <div class="org-sep"></div>
+          <button class="btn" id="upcomingBtn" type="button" style="background:#fff;color:#0e1b39;font-weight:800;border:0;border-radius:8px;padding:10px 12px">Upcoming Events</button>
+          <div class="dash-row" style="margin-top:10px; justify-content:space-between; align-items:center; border:2px solid #10b981; border-radius:8px; padding:8px 12px">
+            <div style="font-weight:800; display:flex; align-items:center; gap:8px">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 11l3-1 3 1 3-1 3 1 3-1v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-8z" stroke="#0e1b39" stroke-width="2" stroke-linejoin="round"/><path d="M6 7V5a2 2 0 0 1 2-2h2l4 3h2a2 2 0 0 1 2 2" stroke="#0e1b39" stroke-width="2" stroke-linecap="round"/></svg>
+              <span>Event: Community Outreach</span>
+            </div>
+            <div id="upcomingTimer" style="font-weight:800">24:00:00</div>
+          </div>
+        </div>
+
+        <div class="dash-card transparent">
+          <div class="dash-head">
+            <div style="flex:0 0 auto; min-width:210px">
+              <div class="donut-title">Max no of hours</div>
+              <svg class="donut" viewBox="0 0 120 120">
+                <defs><linearGradient id="gradA" x1="0" x2="1"><stop offset="0%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#fde68a"/></linearGradient></defs>
+                <circle cx="60" cy="60" r="52" stroke="#eef2ff" stroke-width="12" fill="none"/>
+                <circle id="donutMain" cx="60" cy="60" r="52" stroke="url(#gradA)" stroke-width="12" fill="none" stroke-linecap="round" transform="rotate(-90 60 60)" stroke-dasharray="327 327" stroke-dashoffset="33"/>
+                <text x="60" y="64" text-anchor="middle">90%</text>
+              </svg>
+            </div>
+            <div style="flex:1; display:flex; justify-content:flex-start; align-items:center; margin-left:300px">
+              <div class="stat-box">
+                <div class="value">2,458</div>
+                <div class="label">Amount earned</div>
+                <svg class="profile-ico" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <circle cx="12" cy="8" r="4" stroke="#0e1b39" stroke-width="2"/>
+                  <path d="M4 20c0-4 4-6 8-6s8 2 8 6" stroke="#0e1b39" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <div class="profile-info" aria-hidden="true">
+                  <div class="head">Profile</div>
+                  <ul>
+                    <li>Username:</li>
+                    <li>Events attended:</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="section-sep"><span>Max no of hours</span></div>
+          <svg class="sales" viewBox="0 0 100 160" preserveAspectRatio="none">
+            <rect x="0" y="0" width="100" height="160" fill="none"/>
+            <g fill="#f59e0b">
+              <!-- Bars use percentage-like units via viewBox 0..100 for width -->
+              <!-- Baseline ~ at y=140 (chart height 120) -->
+              <!-- width per bar = 8 units; positions: 0, 16, 32, 48, 64, 80, 92 (last right-aligned) -->
+              <!-- Sun 40% -->
+              <rect x="0" y="92" width="5" height="48"/>
+              <!-- Mon 60% -->
+              <rect x="16" y="68" width="5" height="72"/>
+              <!-- Tue 75% -->
+              <rect x="32" y="50" width="5" height="90"/>
+              <!-- Wed 90% -->
+              <rect x="48" y="32" width="5" height="108"/>
+              <!-- Thu 70% -->
+              <rect x="64" y="56" width="5" height="84"/>
+              <!-- Fri 55% -->
+              <rect x="80" y="74" width="5" height="66"/>
+              <!-- Sat 35% (placed at 92 so right edge hits 100) -->
+              <rect x="92" y="98" width="5" height="42"/>
+            </g>
+            
+          </svg>
+        </div>
+
+        <div class="dash-card transparent" style="display:flex; flex-direction:column">
+          <div style="font-weight:700;margin-bottom:8px">Rating</div>
+          <div class="dash-row" style="justify-content:center; align-items:center; gap:12px">
+            <svg class="mini-ring rating-ring" viewBox="0 0 120 120">
+              <circle cx="60" cy="60" r="48" stroke="#eef2ff" stroke-width="12" fill="none"/>
+              <circle id="ratingArc" cx="60" cy="60" r="48" stroke="#10b981" stroke-width="12" fill="none" transform="rotate(-90 60 60)" stroke-dasharray="302 302" stroke-dashoffset="0"/>
+              <text id="ratingText" x="60" y="66" text-anchor="middle" style="font-size:16px;fill:#1f2a44;font-weight:700">5/5</text>
+            </svg>
+          </div>
+          <div style="margin-top:12px; flex:1; display:flex; flex-direction:column">
+            <label for="ratingComment" style="display:block; font-weight:700; margin-bottom:6px; color:#e7edf8">Comments</label>
+            <textarea id="ratingComment" placeholder="Add your comments..." style="flex:1; height:100%; width:100%; border:1px solid rgba(255,255,255,.25); background:transparent; color:#0e1b39; border-radius:6px; padding:8px; resize:vertical"></textarea>
+          </div>
+        </div>
+      </div>
+      <button id="dashBack" class="dash-back-btn" type="button" aria-label="Back to Browse">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="vertical-align:middle; margin-right:6px"><path d="M15 18l-6-6 6-6" stroke="#0e1b39" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Back
+      </button>
+        </section>
+      </div>
+    </div>
+    <section class="settings-panel" id="settingsPanel">
+      <h3 class="settings-title">Settings</h3>
+      <div class="settings-list">
+        <button class="settings-btn">Profile & Account Settings<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 5l7 7-7 7" stroke="#e7edf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button class="settings-btn">Notification Preferences<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 5l7 7-7 7" stroke="#e7edf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button class="settings-btn">Privacy<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 5l7 7-7 7" stroke="#e7edf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button class="settings-btn">Accessibility<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 5l7 7-7 7" stroke="#e7edf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button class="settings-btn">Payment & Work Preferences<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 5l7 7-7 7" stroke="#e7edf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>
+    </section>
+    <div class="browse-layout">
+      <aside class="profile-panel">
+        <div class="profile-avatar" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <circle cx="12" cy="7.5" r="4.5" stroke="#1f2a44" stroke-width="2"/>
+            <path d="M3.5 20.5c0-4.2 4.5-7 8.5-7s8.5 2.8 8.5 7" stroke="#1f2a44" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <button id="profileBtn" type="button" class="btn primary block">Profile</button>
+      </aside>
+      <div class="browse-content">
+        <section class="header" id="browseHeader">
+          <h1>Available Opportunities</h1>
+          <p>Find the perfect opportunity that matches your skills and interests</p>
+        </section>
+
+        <section class="filters" id="browseFilters">
+          <button class="chip active" data-filter="all">All Jobs</button>
+          <button class="chip" data-filter="volunteer">Volunteer</button>
+          <button class="chip" data-filter="part-time">Part-Time</button>
+          <button class="chip" data-filter="full-time">Full-Time</button>
+        </section>
+
+        <section class="grid" id="browseGrid">
+      <article class="card" data-type="volunteer">
+        <span class="badge">Volunteer</span>
+        <div class="title-row">
+          <h3>Event Volunteers Needed</h3>
+          <div class="thumb" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="3" y="5" width="18" height="16" rx="2" stroke="#1f2a44" stroke-width="2"/>
+              <path d="M3 9h18" stroke="#1f2a44" stroke-width="2"/>
+              <path d="M8 3v4M16 3v4" stroke="#1f2a44" stroke-width="2" stroke-linecap="round"/>
+              <path d="M9 14l2 2 4-4" stroke="#1f2a44" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="muted">Community Events Co.</div>
+        <p>Help organize our annual community festival. Great opportunity to meet people.</p>
+        <div class="meta"><span>Downtown Plaza</span><span>June 15, 2025</span><span>15 workers</span></div>
+        <div class="apply"><a class="btn primary block" href="#">Apply Now</a></div>
+      </article>
+
+      <article class="card" data-type="part-time">
+        <span class="badge" style="background:#eef2ff;color:#3b4cc0">Part-time</span>
+        <div class="title-row">
+          <h3>Weekend Barista</h3>
+          <div class="thumb" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 9h11a3 3 0 0 0 0 6H9a5 5 0 0 1-5-5V9z" stroke="#1f2a44" stroke-width="2"/>
+              <path d="M18 11h2a2 2 0 0 1 0 4h-2" stroke="#1f2a44" stroke-width="2"/>
+              <path d="M6 17h11" stroke="#1f2a44" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="muted">Coffee Corner</div>
+        <p>Looking for friendly baristas for weekend shifts at our busy coffee shop.</p>
+        <div class="meta"><span>Main Street</span><span>Ongoing</span><span>3 workers</span></div>
+        <div class="apply"><a class="btn primary block" href="#">Apply Now</a></div>
+      </article>
+
+      <article class="card" data-type="full-time">
+        <span class="badge" style="background:#ffeefe;color:#7a2e8e">Full-time</span>
+        <div class="title-row">
+          <h3>Marketing Assistant</h3>
+          <div class="thumb" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 12h6l8-5v10l-8-5H3v5" stroke="#1f2a44" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M5 19a2 2 0 0 0 2 2h1" stroke="#1f2a44" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="muted">Digital Marketing Agency</div>
+        <p>Join our team as a full-time marketing assistant. Great growth opportunities.</p>
+        <div class="meta"><span>Office District</span><span>Start Immediately</span><span>2 workers</span></div>
+        <div class="apply"><a class="btn primary block" href="#">Apply Now</a></div>
+      </article>
+
+      <article class="card" data-type="volunteer">
+        <span class="badge">Volunteer</span>
+        <div class="title-row">
+          <h3>Beach Cleanup Volunteers</h3>
+          <div class="thumb" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 21c5-3 7-6 7-10a7 7 0 1 0-14 0c0 4 2 7 7 10z" stroke="#1f2a44" stroke-width="2"/>
+              <path d="M10 11c.5-1.5 1.5-2.5 3-3" stroke="#1f2a44" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="muted">Green Earth Foundation</div>
+        <p>Join us for a monthly beach cleanup initiative. Make a difference in your city.</p>
+        <div class="meta"><span>Sunny Beach</span><span>Every 3rd Saturday</span><span>20 workers</span></div>
+        <div class="apply"><a class="btn primary block" href="#">Apply Now</a></div>
+      </article>
+
+      <article class="card" data-type="part-time">
+        <span class="badge" style="background:#eef2ff;color:#3b4cc0">Part-time</span>
+        <div class="title-row">
+          <h3>Part-Time Sales Associate</h3>
+          <div class="thumb" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6 7h12l2 5H4l2-5z" stroke="#1f2a44" stroke-width="2"/>
+              <path d="M7 12v6a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-6" stroke="#1f2a44" stroke-width="2"/>
+            </svg>
+          </div>
+        </div>
+        <div class="muted">Fashion Boutique</div>
+        <p>Help customers find the perfect products. Flexible hours, great team.</p>
+        <div class="meta"><span>Shopping Mall</span><span>Immediate Start</span><span>4 workers</span></div>
+        <div class="apply"><a class="btn primary block" href="#">Apply Now</a></div>
+      </article>
+
+      <article class="card" data-type="full-time">
+        <span class="badge" style="background:#ffeefe;color:#7a2e8e">Full-time</span>
+        <div class="title-row">
+          <h3>Software Developer</h3>
+          <div class="thumb" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 6h16v12H4z" stroke="#1f2a44" stroke-width="2"/>
+              <path d="M8 14l-2-2 2-2M16 10l2 2-2 2" stroke="#1f2a44" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="muted">Tech Solutions Inc.</div>
+        <p>Full-time position developing web applications. Competitive salary and benefits.</p>
+        <div class="meta"><span>Tech Hub</span><span>ASAP</span><span>2 workers</span></div>
+        <div class="apply"><a class="btn primary block" href="#">Apply Now</a></div>
+      </article>
+    </section>
+
+    <div class="footer-space"></div>
+  </main>
+  </div>
+
+  <!-- Modal search overlay (outside .app so it stays sharp) -->
+  <div class="modal" id="searchModal" aria-hidden="true">
+    <div class="backdrop"></div>
+    <div class="panel">
+      <button class="close" id="closeSearch" aria-label="Close">×</button>
+      <h3>Search Opportunities</h3>
+      <div class="searchbar">
+        <div class="field">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 21l-4.35-4.35" stroke="#000" stroke-width="2" stroke-linecap="round"/><circle cx="11" cy="11" r="7" stroke="#000" stroke-width="2"/></svg>
+          <input type="text" placeholder="Search by title, location or type..." autofocus />
+        </div>
+        <div class="suggestions" id="searchSuggestions" aria-live="polite"><ul></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="rating-overlay" id="ratingOverlay" aria-hidden="true">
+    <div class="rating-panel" role="dialog" aria-modal="true" aria-label="Give Rating">
+      <h4>Give Rating</h4>
+      <div>
+        <label for="ratingInput" style="display:block; font-weight:700; margin-bottom:6px; color:#e7edf8">Enter a rating (0-5)</label>
+        <input id="ratingInput" type="number" min="0" max="5" step="1" value="5" style="width:100%; padding:8px; border-radius:6px; border:1px solid rgba(255,255,255,.25); background:#fff; color:#0e1b39; font-weight:700" />
+      </div>
+      <div class="rating-actions">
+        <button type="button" id="ratingCancel">Cancel</button>
+        <button type="button" id="ratingSubmit">Submit</button>
+      </div>
+    </div>
+  </div>
+  <script src="assets/app.js"></script>
+  <script>
+    (function(){
+      function pad(n){return n<10? '0'+n : ''+n}
+      var timerEl = document.getElementById('upcomingTimer');
+      if(!timerEl) return;
+      var DAY_MS = 24*60*60*1000;
+      var end = Date.now() + DAY_MS;
+      function tick(){
+        var now = Date.now();
+        var remain = end - now;
+        if (remain <= 0){
+          end = Date.now() + DAY_MS;
+          remain = end - Date.now();
+        }
+        var hrs = Math.floor(remain/3600000);
+        var mins = Math.floor((remain%3600000)/60000);
+        var secs = Math.floor((remain%60000)/1000);
+        timerEl.textContent = pad(hrs)+":"+pad(mins)+":"+pad(secs);
+      }
+      tick();
+      setInterval(tick, 1000);
+
+      // Earnings-by-date behavior
+      var earnDateEl = document.getElementById('earnDate');
+      var earnAmountEl = document.getElementById('earnAmount');
+      if (earnDateEl && earnAmountEl){
+        var today = new Date();
+        var todayStr = new Date(today.getTime() - today.getTimezoneOffset()*60000).toISOString().slice(0,10);
+        var earningsData = {};
+        earningsData[todayStr] = '₹2,458';
+        earningsData['2025-06-15'] = '₹1,200';
+        earningsData['2025-06-16'] = '₹980';
+        function updateAmount(){
+          var v = earnDateEl.value;
+          earnAmountEl.textContent = 'Amount: ' + (earningsData[v] || '—');
+        }
+        earnDateEl.addEventListener('change', updateAmount);
+        if (!earnDateEl.value){ earnDateEl.value = todayStr; }
+        updateAmount();
+      }
+
+      // Interactive single rating ring with modal overlay
+      var ring = document.querySelector('.rating-ring');
+      var arc = document.getElementById('ratingArc');
+      var txt = document.getElementById('ratingText');
+      var overlay = document.getElementById('ratingOverlay');
+      var ratingInput = document.getElementById('ratingInput');
+      var ratingCancel = document.getElementById('ratingCancel');
+      var ratingSubmit = document.getElementById('ratingSubmit');
+      function applyRating(val){
+        var n = Math.max(0, Math.min(5, Number(val)||0));
+        if(txt) txt.textContent = n + '/5';
+        if(arc){
+          var color = (n >= 4) ? '#10b981' : (n === 3 ? '#f59e0b' : '#f87171');
+          arc.setAttribute('stroke', color);
+        }
+      }
+      function openRating(){
+        if(!overlay) return;
+        document.body.classList.add('modal-blur');
+        overlay.classList.add('show');
+        if(ratingInput){ setTimeout(()=> ratingInput.focus(), 50); }
+      }
+      function closeRating(){
+        if(!overlay) return;
+        overlay.classList.remove('show');
+        document.body.classList.remove('modal-blur');
+      }
+      if(ring){
+        ring.style.cursor = 'pointer';
+        ring.addEventListener('click', openRating);
+      }
+      if(ratingCancel){ ratingCancel.addEventListener('click', closeRating); }
+      if(ratingSubmit){
+        ratingSubmit.addEventListener('click', function(){
+          if(ratingInput){ applyRating(ratingInput.value); }
+          closeRating();
+        });
+      }
+    })();
+  </script>
+  </body>
+  </html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ConnectIQ • Browse Jobs</title>
+  <link rel="stylesheet" href="assets/style.css" />
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
+</head>
+<body>
+  <nav class="navbar">
+    <div class="container navbar-inner">
+      <button class="hamburger" id="menuBtn" aria-label="Open menu"><span></span></button>
+      <a class="brand" href="worklink.html"><span class="brand-badge"><img alt="ConnectIQ" src="assets/logo.svg"/></span> ConnectIQ</a>
+      <div class="navlinks">
+        <a class="btn" href="login.html">Login</a>
+        <a class="btn primary" data-cta="volunteer" href="register-volunteer.html">Register as Volunteer</a>
+        <a class="btn" data-cta="organizer" href="register-organizer.html">Register as Organizer</a>
+        <a class="btn" href="javascript:history.back()" aria-label="Go back">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="margin-right:6px; vertical-align:middle"><path d="M15 18l-6-6 6-6" stroke="#1f2a44" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back
+        </a>
+      </div>
+    </div>
+  </nav>
+  <aside class="sidebar" id="sidebar">
+    <h3>Options</h3>
+    <a href="browse.html" data-side="browse"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke-width="2"/><path d="M12 3v18" stroke-width="2"/><path d="M3 12h18" stroke-width="2"/></svg>Browse Jobs</a>
+    <a href="worklink.html" data-side="dashboard"><svg viewBox="0 0 24 24" fill="none"><path d="M3 13h8V3H3v10zm10 8h8V3h-8v18z" stroke-width="2"/></svg>Dashboard</a>
+    <a href="#" data-side="location"><svg viewBox="0 0 24 24" fill="none"><path d="M12 21s-6-5.2-6-10a6 6 0 1 1 12 0c0 4.8-6 10-6 10z" stroke-width="2"/><circle cx="12" cy="11" r="2" stroke-width="2"/></svg>Location</a>
+    <a href="worklink.html" data-side="settings"><svg viewBox="0 0 24 24" fill="none"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" stroke-width="2"/><path d="M19.4 15a7.96 7.96 0 0 0 .1-2 7.96 7.96 0 0 0-.1-2l2.1-1.6-2-3.4-2.5 1a8.2 8.2 0 0 0-3.5-2L13 1h-4l-.5 3.1a8.2 8.2 0 0 0-3.5 2l-2.5-1-2 3.4 2.1 1.6a7.96 7.96 0 0 0-.1 2 7.96 7.96 0 0 0 .1 2L.5 16.6l2 3.4 2.5-1a8.2 8.2 0 0 0 3.5 2L9 23h4l.5-3.1a8.2 8.2 0 0 0 3.5-2l2.5 1 2-3.4-2.1-1.6z" stroke-width="2"/></svg>Settings</a>
+  </aside>
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+  <main class="container">
+    <section class="header">
+      <h1>Available Opportunities</h1>
+      <p>Find the perfect opportunity that matches your skills and interests</p>
+    </section>
+
+    <section class="searchbar hidden">
+      <div class="field">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 21l-4.35-4.35" stroke="#6b7aa6" stroke-width="2" stroke-linecap="round"/><circle cx="11" cy="11" r="7" stroke="#6b7aa6" stroke-width="2"/></svg>
+        <input type="search" placeholder="Search jobs by title, description, or location..." />
+      </div>
+    </section>
+
+    <section class="filters">
+      <button class="chip active" data-filter="all">All Jobs</button>
+      <button class="chip" data-filter="volunteer">Volunteer</button>
+      <button class="chip" data-filter="part-time">Part-Time</button>
+      <button class="chip" data-filter="full-time">Full-Time</button>
+    </section>
+
+    <section class="grid">
+      <article class="card" data-type="volunteer">
+        <span class="badge">Volunteer</span>
+        <h3>Event Volunteers Needed</h3>
+        <div class="muted">Community Events Co.</div>
+        <p>Help organize our annual community festival. Great opportunity to meet people.</p>
+        <div class="meta"><span>Downtown Plaza</span><span>June 15, 2025</span><span>15 workers</span></div>
+        <div class="apply"><a class="btn primary block" href="#">Apply Now</a></div>
+      </article>
+
+      <article class="card" data-type="part-time">
+        <span class="badge" style="background:#eef2ff;color:#3b4cc0">Part-time</span>
+        <h3>Weekend Barista</h3>
+        <div class="muted">Coffee Corner</div>
+        <p>Looking for friendly baristas for weekend shifts at our busy coffee shop.</p>
+        <div class="meta"><span>Main Street</span><span>Ongoing</span><span>3 workers</span></div>
+        <div class="apply"><a class="btn primary block" href="#">Apply Now</a></div>
+      </article>
+
+      <article class="card" data-type="full-time">
+        <span class="badge" style="background:#ffeefe;color:#7a2e8e">Full-time</span>
+        <h3>Marketing Assistant</h3>
+        <div class="muted">Digital Marketing Agency</div>
+        <p>Join our team as a full-time marketing assistant. Great growth opportunities.</p>
+        <div class="meta"><span>Office District</span><span>Start Immediately</span><span>2 workers</span></div>
+        <div class="apply"><a class="btn primary block" href="#">Apply Now</a></div>
+      </article>
+
+      <article class="card" data-type="volunteer">
+        <span class="badge">Volunteer</span>
+        <h3>Beach Cleanup Volunteers</h3>
+        <div class="muted">Green Earth Foundation</div>
+        <p>Join us for a monthly beach cleanup initiative. Make a difference in your city.</p>
+        <div class="meta"><span>Sunny Beach</span><span>Every 3rd Saturday</span><span>20 workers</span></div>
+        <div class="apply"><a class="btn primary block" href="#">Apply Now</a></div>
+      </article>
+
+      <article class="card" data-type="part-time">
+        <span class="badge" style="background:#eef2ff;color:#3b4cc0">Part-time</span>
+        <h3>Part-Time Sales Associate</h3>
+        <div class="muted">Fashion Boutique</div>
+        <p>Help customers find the perfect products. Flexible hours, great team.</p>
+        <div class="meta"><span>Shopping Mall</span><span>Immediate Start</span><span>4 workers</span></div>
+        <div class="apply"><a class="btn primary block" href="#">Apply Now</a></div>
+      </article>
+
+      <article class="card" data-type="full-time">
+        <span class="badge" style="background:#ffeefe;color:#7a2e8e">Full-time</span>
+        <h3>Software Developer</h3>
+        <div class="muted">Tech Solutions Inc.</div>
+        <p>Full-time position developing web applications. Competitive salary and benefits.</p>
+        <div class="meta"><span>Tech Hub</span><span>ASAP</span><span>2 workers</span></div>
+        <div class="apply"><a class="btn primary block" href="#">Apply Now</a></div>
+      </article>
+    </section>
+
+    <div class="footer-space"></div>
+  </main>
+
+  <script src="assets/app.js"></script>
+</body>
+</html>
